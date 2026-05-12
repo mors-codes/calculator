@@ -1,0 +1,133 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0d1117;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.calculator {
+  background-color: #1e1b2e;
+  border: 4px solid #3b3560;
+  border-bottom: 12px solid #3b3560;
+  border-radius: 18px;
+  padding: 35px 40px;
+  width: 500px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}   
+
+.title {
+  font-size: 20px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-weight: normal;
+}
+
+.display {
+  background-color: #111018;
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: right;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.expression {
+  font-size: 11px;
+  color: #888;
+  min-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.result {
+  font-size: 28px;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.divider {
+  height: 1px;
+  background-color: #3b3560;
+  margin: 18px 0;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.btn {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 16px;
+  padding: 18px 0;
+  border: 3px solid rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  color: #ffffff;
+  image-rendering: pixelated;
+  border-bottom: 7px solid rgba(0, 0, 0, 0.4);
+  transition: border-bottom 0.1s ease, transform 0.1s ease;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+}
+
+.btn:active {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  transform: translateY(5px);
+  filter: brightness(0.85);
+}
+
+/* AC spans 2 columns, DEL spans 2 columns */
+#ac {
+  grid-column: span 2;
+  background-color: #e03e3e;
+}
+
+#del {
+  grid-column: span 2;
+  background-color: #e07c1a;
+}
+
+/* Equals spans 1 column only */
+#equals {
+  background-color: #7c5cbf;
+}
+
+.btn-dark {
+  background-color: #2e2b3e;
+}
+
+.btn-dark:hover {
+  background-color: #3a3750;
+}
+
+.btn-purple {
+  background-color: #7c5cbf;
+}
+
+.btn-purple:hover {
+  background-color: #8f6fd4;
+}
+
+.btn-red:hover {
+  background-color: #f04f4f;
+}
+
+.btn-orange:hover {
+  background-color: #f08c30;
+}
