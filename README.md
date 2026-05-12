@@ -35,7 +35,6 @@ A retro pixel-style calculator built with vanilla HTML, CSS, and JavaScript — 
 
 ## 📁 File Structure
 calculator/
-
 ├── index.html
 ├── style.css
 ├── script.js
