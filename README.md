@@ -37,11 +37,8 @@ A retro pixel-style calculator built with vanilla HTML, CSS, and JavaScript — 
 calculator/
 
 ├── index.html
-
 ├── style.css
-
 ├── script.js
-
 └── README.md
 
 ---
