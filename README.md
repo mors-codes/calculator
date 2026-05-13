@@ -35,10 +35,10 @@ A retro pixel-style calculator built with vanilla HTML, CSS, and JavaScript — 
 
 ## 📁 File Structure
 calculator/
-├── index.html
-├── style.css
-├── script.js
-└── README.md
+- `index.html` — markup and structure
+- `style.css` — styling and layout
+- `script.js` — calculator logic
+- `README.md` — project documentation
 
 ---
 
