@@ -4,7 +4,20 @@ const resultEl = document.getElementById('result');
 let currentInput = '';
 let justEvaluated = false;
 
-const MAX_DIGITS = 16;
+const operators = ['+', '-', '*', '/'];
+
+function formatWithCommas(value) {
+  const str = String(value);
+  const [integer, decimal] = str.split('.');
+  const formatted = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decimal !== undefined ? formatted + '.' + decimal : formatted;
+}
+
+function getDigitCount(input) {
+  const parts = input.split(/[+\-*/]/);
+  const lastPart = parts[parts.length - 1];
+  return lastPart.replace(/\./g, '').length;
+}
 
 function shrinkText() {
   const display = document.querySelector('.display');
@@ -18,192 +31,124 @@ function shrinkText() {
   }
 }
 
-function formatWithCommas(value) {
-  const str = String(value);
-  const [integer, decimal] = str.split('.');
-  const formatted = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return decimal !== undefined ? formatted + '.' + decimal : formatted;
+function setActiveOperator(op) {
+  document.querySelectorAll('.op-indicator').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  const map = {
+    '+': 'ind-add',
+    '-': 'ind-subtract',
+    '*': 'ind-multiply',
+    '/': 'ind-divide'
+  };
+
+  if (op && map[op]) {
+    document.getElementById(map[op]).classList.add('active');
+  }
 }
 
-function getDigitCount(input) {
-  const parts = input.split(/[\+\-\*\/]/);
-  const lastPart = parts[parts.length - 1];
-  return lastPart.replace(/\./g, '').length;
-}
-
-function updateDisplay(expr, res) {
-  expressionEl.textContent = expr;
-  resultEl.textContent = res;
-  shrinkText();
-}
-
-function formatExpression(expr) {
-  return expr.replace(/\*/g, '×').replace(/\//g, '÷');
-}
-
-function getFirstNum(input) {
-  const match = input.match(/^-?[\d.]*/);
-  return match ? parseFloat(match[0]) : 0;
-}
-
-function getOperator(input) {
-  const match = input.match(/[\+\-\*\/](?=[\d\.])/);
-  return match ? match[0] : '';
-}
-
-function getLastNum(input) {
-  const parts = input.split(/(?<=[0-9])[\+\-\*\/]/);
-  return parts[parts.length - 1];
-}
-
-function buildTopDisplay(input) {
-  const firstNum = getFirstNum(input);
-  const op = getOperator(input);
-  if (!op) return '';
-  return formatWithCommas(firstNum) + ' ' + formatExpression(op);
-}
-
-// Number / decimal buttons
 document.querySelectorAll('.btn[data-value]').forEach(btn => {
-  const val = btn.getAttribute('data-value');
-  if (['+', '-', '*', '/'].includes(val)) return;
-
   btn.addEventListener('click', () => {
-    if (justEvaluated) {
+    const val = btn.getAttribute('data-value');
+
+    if (justEvaluated && !operators.includes(val)) {
       currentInput = '';
       justEvaluated = false;
+      setActiveOperator(null);
     }
 
-    if (val !== '.' && getDigitCount(currentInput) >= MAX_DIGITS) return;
-
-    if (val === '.') {
-      const lastNum = getLastNum(currentInput);
-      if (lastNum.includes('.')) return;
-      if (lastNum === '') currentInput += '0';
-    }
-
-    currentInput += val;
-
-    const op = getOperator(currentInput);
-    const lastNum = getLastNum(currentInput);
-
-    if (op) {
-      const displayBottom = lastNum === '' || lastNum === '-'
-        ? '0'
-        : formatWithCommas(lastNum);
-      updateDisplay(buildTopDisplay(currentInput), displayBottom);
-    } else {
-      const displayResult = lastNum === '' ? '0' : formatWithCommas(lastNum);
-      updateDisplay('', displayResult);
-    }
-  });
-});
-
-// Operator buttons
-document.querySelectorAll('.btn[data-value]').forEach(btn => {
-  const val = btn.getAttribute('data-value');
-  if (!['+', '-', '*', '/'].includes(val)) return;
-
-  btn.addEventListener('click', () => {
     justEvaluated = false;
 
-    if (currentInput === '' && val === '-') {
-      currentInput = '-';
-      updateDisplay('', '-');
-      return;
-    }
-
-    if (currentInput === '') return;
-
     const lastChar = currentInput.slice(-1);
-    if (['+', '-', '*', '/'].includes(lastChar)) {
-      currentInput = currentInput.slice(0, -1);
+
+    if (operators.includes(val) && currentInput === '' && val !== '-') return;
+
+    if (operators.includes(val) && operators.includes(lastChar)) return;
+
+    if (val === '.') {
+      const parts = currentInput.split(/[+\-*/]/);
+      const lastNum = parts[parts.length - 1];
+      if (lastNum.includes('.')) return;
     }
+
+    if (val !== '.' && getDigitCount(currentInput) >= 16) return;
 
     currentInput += val;
 
-    const firstNum = getFirstNum(currentInput);
-    updateDisplay(formatWithCommas(firstNum) + ' ' + formatExpression(val), '0');
+    if (operators.includes(val)) {
+      setActiveOperator(val);
+    }
+
+    expressionEl.textContent = '';
+    const lastNum = currentInput.split(/[+\-*/]/).pop();
+    resultEl.textContent = lastNum ? formatWithCommas(lastNum) : '0';
+    shrinkText();
   });
 });
 
-// Equals
+// AC - clears everything
+document.getElementById('ac').addEventListener('click', () => {
+  currentInput = '';
+  resultEl.textContent = '0';
+  expressionEl.textContent = '';
+  setActiveOperator(null);
+  shrinkText();
+});
+
+// DEL - removes last character
+document.getElementById('del').addEventListener('click', () => {
+  currentInput = currentInput.slice(0, -1);
+  const lastNum = currentInput.split(/[+\-*/]/).pop();
+  resultEl.textContent = lastNum ? formatWithCommas(lastNum) : '0';
+  shrinkText();
+});
+
+// EQUALS - evaluates the expression
 document.getElementById('equals').addEventListener('click', () => {
   if (currentInput === '') return;
 
   try {
-    const expr = currentInput;
-    const evaluated = Function('"use strict"; return (' + expr + ')')();
+    const result = Function('"use strict"; return (' + currentInput + ')')();
 
-    if (!isFinite(evaluated)) {
-      updateDisplay(buildTopDisplay(expr) + ' ' + getLastNum(expr) + ' =', 'Error');
+    if (!isFinite(result)) {
+      expressionEl.textContent = currentInput + ' =';
+      resultEl.textContent = 'Error';
       currentInput = '';
       justEvaluated = true;
+      setActiveOperator(null);
       return;
     }
 
-    const rounded = parseFloat(evaluated.toFixed(10));
-
-    if (Math.abs(rounded) >= 1e16) {
-      updateDisplay(buildTopDisplay(expr), 'Overflow');
+    if (Math.abs(result) >= 1e16) {
+      expressionEl.textContent = currentInput + ' =';
+      resultEl.textContent = 'Overflow';
       currentInput = '';
       justEvaluated = true;
+      setActiveOperator(null);
       return;
     }
 
-    const firstNum = getFirstNum(expr);
-    const op = getOperator(expr);
-    const lastNum = getLastNum(expr);
-    const topDisplay = formatWithCommas(firstNum) + ' ' + formatExpression(op) + ' ' + formatWithCommas(lastNum) + ' =';
-
-    updateDisplay(topDisplay, formatWithCommas(rounded));
-    currentInput = String(rounded);
+    expressionEl.textContent = currentInput + ' =';
+    resultEl.textContent = formatWithCommas(result);
+    currentInput = String(result);
     justEvaluated = true;
+    setActiveOperator(null);
+    shrinkText();
   } catch {
-    updateDisplay('', 'Error');
+    expressionEl.textContent = '';
+    resultEl.textContent = 'Error';
     currentInput = '';
-    justEvaluated = true;
+    setActiveOperator(null);
   }
 });
 
-// AC
-document.getElementById('ac').addEventListener('click', () => {
-  currentInput = '';
-  justEvaluated = false;
-  updateDisplay('', '0');
-});
-
-// DEL
-document.getElementById('del').addEventListener('click', () => {
-  if (justEvaluated) {
-    currentInput = '';
-    justEvaluated = false;
-    updateDisplay('', '0');
-    return;
-  }
-
-  currentInput = currentInput.slice(0, -1);
-
-  const op = getOperator(currentInput);
-  const lastNum = getLastNum(currentInput);
-
-  if (currentInput === '') {
-    updateDisplay('', '0');
-  } else if (op) {
-    const displayBottom = lastNum === '' ? '0' : formatWithCommas(lastNum);
-    updateDisplay(buildTopDisplay(currentInput), displayBottom);
-  } else {
-    updateDisplay('', formatWithCommas(lastNum) || '0');
-  }
-});
-
-// Keyboard support
 document.addEventListener('keydown', (e) => {
   if (e.key >= '0' && e.key <= '9') {
     document.querySelector(`.btn[data-value="${e.key}"]`)?.click();
   } else if (e.key === '.') {
     document.querySelector('.btn[data-value="."]')?.click();
-  } else if (['+', '-', '*', '/'].includes(e.key)) {
+  } else if (operators.includes(e.key)) {
     document.querySelector(`.btn[data-value="${e.key}"]`)?.click();
   } else if (e.key === 'Enter' || e.key === '=') {
     document.getElementById('equals').click();

@@ -40,6 +40,7 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   gap: 6px;
+  position: relative;
 }
 
 .expression {
@@ -55,6 +56,26 @@ body {
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.operators-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.op-indicator {
+  font-size: 11px;
+  color: #3b3560;
+  transition: color 0.15s ease;
+}
+
+.op-indicator.active {
+  color: #a29bfe;
 }
 
 .divider {
@@ -80,6 +101,8 @@ body {
   image-rendering: pixelated;
   border-bottom: 7px solid rgba(0, 0, 0, 0.4);
   transition: border-bottom 0.1s ease, transform 0.1s ease;
+  height: 60px;
+  line-height: 1;
 }
 
 .btn:hover {
