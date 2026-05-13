@@ -35,7 +35,7 @@ body {
   border-radius: 8px;
   padding: 14px 16px;
   text-align: right;
-  min-height: 72px;
+  height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -48,7 +48,15 @@ body {
   color: #888;
   min-height: 16px;
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: auto;
+  padding-left: 30px;
+  margin-left: 30px;
+  scrollbar-width: none;
+  text-align: right;
+}
+
+.expression::-webkit-scrollbar {
+  display: none;
 }
 
 .result {
@@ -56,16 +64,17 @@ body {
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
+  padding-left: 30px;
+  margin-left: 30px;
 }
 
 .operators-indicator {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   position: absolute;
   left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 14px;
 }
 
 .op-indicator {

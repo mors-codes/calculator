@@ -48,6 +48,19 @@ function setActiveOperator(op) {
   }
 }
 
+function formatExpression(input) {
+  const parts = input.split(/([+\-*/])/);
+  return parts.map(part => {
+    if (operators.includes(part)) return ' ' + part + ' ';
+    if (part === '') return '';
+    return formatWithCommas(parseFloat(part));
+  }).join('');
+}
+
+function scrollExpression() {
+  expressionEl.scrollLeft = expressionEl.scrollWidth;
+}
+
 document.querySelectorAll('.btn[data-value]').forEach(btn => {
   btn.addEventListener('click', () => {
     const val = btn.getAttribute('data-value');
@@ -112,7 +125,8 @@ document.getElementById('equals').addEventListener('click', () => {
     const result = Function('"use strict"; return (' + currentInput + ')')();
 
     if (!isFinite(result)) {
-      expressionEl.textContent = currentInput + ' =';
+      expressionEl.textContent = formatExpression(currentInput) + ' =';
+      scrollExpression();
       resultEl.textContent = 'Error';
       currentInput = '';
       justEvaluated = true;
@@ -121,7 +135,8 @@ document.getElementById('equals').addEventListener('click', () => {
     }
 
     if (Math.abs(result) >= 1e16) {
-      expressionEl.textContent = currentInput + ' =';
+      expressionEl.textContent = formatExpression(currentInput) + ' =';
+      scrollExpression();
       resultEl.textContent = 'Overflow';
       currentInput = '';
       justEvaluated = true;
@@ -129,9 +144,11 @@ document.getElementById('equals').addEventListener('click', () => {
       return;
     }
 
-    expressionEl.textContent = currentInput + ' =';
-    resultEl.textContent = formatWithCommas(result);
-    currentInput = String(result);
+    const rounded = parseFloat(result.toFixed(10));
+    expressionEl.textContent = formatExpression(currentInput) + ' =';
+    scrollExpression();
+    resultEl.textContent = formatWithCommas(rounded);
+    currentInput = String(rounded);
     justEvaluated = true;
     setActiveOperator(null);
     shrinkText();
