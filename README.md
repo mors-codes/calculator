@@ -15,6 +15,8 @@ A retro pixel-style calculator built with vanilla HTML, CSS, and JavaScript — 
 - 16-digit input limit per number
 - Auto text shrink when numbers get long
 - Expression shown on top, result on bottom
+- Operator indicators on the display
+- Blocks invalid operator input at start
 - Error and Overflow handling
 - Full keyboard support
 
